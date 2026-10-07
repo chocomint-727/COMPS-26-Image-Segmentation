@@ -1,0 +1,9 @@
+mix_path,clean_path,noise_path,duration
+train/148612/mixture.wav,train/148612/clean.wav,train/148612/noise.wav,30.003
+train/071884/mixture.wav,train/071884/clean.wav,train/071884/noise.wav,30.003
+train/057640/mixture.wav,train/057640/clean.wav,train/057640/noise.wav,30.003
+train/053587/mixture.wav,train/053587/clean.wav,train/053587/noise.wav,29.977
+train/045127/mixture.wav,train/045127/clean.wav,train/045127/noise.wav,30.003
+train/003624/mixture.wav,train/003624/clean.wav,train/003624/noise.wav,30.003
+train/110084/mixture.wav,train/110084/clean.wav,train/110084/noise.wav,29.977
+train/108456/mixture.wav,train/108456/clean.wav,train/108456/noise.wav,29.977

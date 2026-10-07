@@ -1,0 +1,11 @@
+split,clip_id,duration,snr_db,noise_type,noise_file
+train,148612,30.003,10,analog,raw/noise/analog/tape_hiss_04.wav
+train,071884,30.003,15,analog,raw/noise/analog/tape_hiss_02.wav
+train,057640,30.003,15,analog,raw/noise/analog/tape_hiss_00.wav
+train,053587,29.977,0,analog,raw/noise/analog/tape_hiss_01.wav
+train,045127,30.003,5,analog,raw/noise/analog/vinyl_crackle_00.wav
+train,003624,30.003,10,demand,raw/noise/demand/DWASHING/DWASHING/ch01.wav
+train,110084,29.977,15,analog,raw/noise/analog/vinyl_crackle_03.wav
+train,108456,29.977,10,demand,raw/noise/demand/DWASHING/DWASHING/ch01.wav
+val,091791,30.003,0,analog,raw/noise/analog/tape_hiss_05.wav
+test,123502,30.003,20,demand,raw/noise/demand/DLIVING/DLIVING/ch01.wav

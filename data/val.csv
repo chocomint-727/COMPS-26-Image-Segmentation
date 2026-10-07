@@ -1,0 +1,2 @@
+mix_path,clean_path,noise_path,duration
+val/091791/mixture.wav,val/091791/clean.wav,val/091791/noise.wav,30.003
