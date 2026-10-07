@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 clean/
 noise/
 train/
 val/
 test/
+=======
+__pycache__/
+*.py[codz]
+*$py.class
+.env
+>>>>>>> 8002cba119ea07c7169b2684a10de64751b3d888

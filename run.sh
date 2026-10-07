@@ -1,0 +1,1 @@
+docker run --gpus all --ipc=host -it -v "$(pwd)":/ws comps-image-segmentation bash
