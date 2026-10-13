@@ -15,5 +15,8 @@ test/
 *.wav
 *.mp3
 *.npy
-data/spectrogram/wav-files/
-data/spectrogram/numpy-files/
+data/spectrogram/wav-files/*
+data/spectrogram/numpy-files/*
+
+!data/spectrogram/wav-files/.gitkeep
+!data/spectrogram/numpy-files/.gitkeep
