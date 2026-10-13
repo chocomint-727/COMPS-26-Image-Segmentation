@@ -1,12 +1,19 @@
-<<<<<<< HEAD
+# Byte-compiled / optimized / environment
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+
+# Dataset & split directories
 clean/
 noise/
 train/
 val/
 test/
-=======
-__pycache__/
-*.py[codz]
-*$py.class
-.env
->>>>>>> 8002cba119ea07c7169b2684a10de64751b3d888
+
+# Audio, spectrograms, & NumPy arrays
+*.wav
+*.mp3
+*.npy
+data/spectrogram/wav-files/
+data/spectrogram/numpy-files/
