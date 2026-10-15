@@ -9,8 +9,10 @@ from pathlib import Path
 
 # Create the output directory if it doesn't exist
 input_path = Path("../data/spectrogram/wav-files")  # Replace with your actual input directory path
-output_dir = Path("../data/spectrogram/numpy-files")  # Replace with your actual output directory path
-output_dir.mkdir(parents=True, exist_ok=True)
+output_dir_numpy = Path("../data/spectrogram/numpy-files")  # Replace with your actual output directory path
+output_dir_spectrogram = Path("../data/spectrogram/spectrogram-images")  # Replace with your actual output directory path
+output_dir_numpy.mkdir(parents=True, exist_ok=True)
+output_dir_spectrogram.mkdir(parents=True, exist_ok=True)
 audio_files = list(input_path.glob("*.wav"))  # Get all .wav files in the input directory
 
 
@@ -39,20 +41,21 @@ for files in audio_files:
         # Row 0   (Low)  │ -75.0 dB     -72.3 dB     -74.1 dB       ...    -80.0 dB │
         #               └──────────────────────────────────────────────────────────┘
         S_db = librosa.amplitude_to_db(magnitude, ref=np.max)
-        full_save_path = output_dir / f"{files.stem}_spectrogram.npy"
+        full_save_path = output_dir_numpy / f"{files.stem}_spectrogram.npy"
         np.save(full_save_path, S_db)
 
     except Exception as e:
         print(f"Error processing {files}: {e}")
 
-# Plot and display the spectrogram
-# plt.figure(figsize=(10, 4))
-# librosa.display.specshow(S_db, sr=sr, x_axis="time", y_axis="hz")
-# plt.colorbar(format="%+2.0f dB")
-# plt.title(f"Spectrogram: {file_path}")
-# plt.xlabel("Time (s)")
-# plt.ylabel("Frequency (Hz)")
-# plt.tight_layout()
+    # Plot and display the spectrogram
+    plt.figure(figsize=(10, 4))
+    librosa.display.specshow(S_db, sr=sr, x_axis="time", y_axis="hz")
+    plt.colorbar(format="%+2.0f dB")
+    plt.title(f"Spectrogram: {files}")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.tight_layout()
 
-# # To save instead of showing, use: plt.savefig("spectrogram.png", dpi=300)
-# plt.show()
+    # To save instead of showing, use: plt.savefig("spectrogram.png", dpi=300)
+    # plt.show()
+    plt.savefig(f"{output_dir_spectrogram}/{files.stem}_spectrogram.png", dpi=300)
