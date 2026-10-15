@@ -17,6 +17,8 @@ test/
 *.npy
 data/spectrogram/wav-files/*
 data/spectrogram/numpy-files/*
+data/spectrogram/spectrogram-images/*
 
 !data/spectrogram/wav-files/.gitkeep
 !data/spectrogram/numpy-files/.gitkeep
+!data/spectrogram/spectrogram-images/.gitkeep
