@@ -1,4 +1,24 @@
+# Byte-compiled / optimized / environment
 __pycache__/
-*.py[codz]
+*.py[cod]
 *$py.class
 .env
+
+# Dataset & split directories
+clean/
+noise/
+train/
+val/
+test/
+
+# Audio, spectrograms, & NumPy arrays
+*.wav
+*.mp3
+*.npy
+data/spectrogram/wav-files/*
+data/spectrogram/numpy-files/*
+data/spectrogram/spectrogram-images/*
+
+!data/spectrogram/wav-files/.gitkeep
+!data/spectrogram/numpy-files/.gitkeep
+!data/spectrogram/spectrogram-images/.gitkeep
