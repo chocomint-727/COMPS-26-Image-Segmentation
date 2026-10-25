@@ -1,79 +1,68 @@
 
 import numpy as np
 import soundfile as sf
+from pathlib import Path
 
 
-# Load audio files
-def load_audio(filename):
-    audio, sr = sf.read(filename) #Load audio file using soundfile
-
-    if audio.ndim == 2:
-        audio = np.mean(audio, axis=1) #Convert channels to mono by averaging channels if mutiple channels are present
-
-    return audio, sr
+clean_folder = Path("../data/spectrogram/clean")
+noisy_folder = Path("../data/spectrogram/noisy")
+denoised_folder = Path("../data/spectrogram/denoised")
 
 
-# Calculate Signal-to-Noise Ratio
-def calculate_snr(clean, audio): 
-    signal = np.sum(clean ** 2) # ccalculate the power of the clean signal 
-    error = np.sum((clean - audio) ** 2) # calcualte the power of the error signal the differece 
+def load_spectrogram(filename):
+    # Load spectrogram from .npy file
+    return np.load(filename)
 
-    return 10 * np.log10(signal / (error + 1e-10)) 
+#mean squared erroe
+def calculate_mse(clean, audio):
+    return np.mean((clean - audio) ** 2)
 
-
-# Calculate Scale-Invariant Signal-to-Distortion Ratio
-def calculate_si_sdr(clean, audio):
-    clean = clean - np.mean(clean)
-    audio = audio - np.mean(audio)
-
-    # Find the scaling factor that best matches the clean audio
-    scale = np.dot(audio, clean) / (np.sum(clean ** 2) + 1e-10) # 1e-10 is added to avoid division by zero
-    target = scale * clean
-    error = audio - target
-
-    return 10 * np.log10( 
-        #ratio is converted into decibels using 10 * np.log10()
-        (np.sum(target ** 2) + 1e-10) /
-        (np.sum(error ** 2) + 1e-10)
-    )
-
-
-# Calculate percentage error reduction
+#c alculate error reduction percentage
 def calculate_error_reduction(clean, noisy, denoised):
-    before = np.sum((clean - noisy) ** 2)
-    after = np.sum((clean - denoised) ** 2)
- 
-    return (before - after) / (before + 1e-10) * 100
+    before = calculate_mse(clean, noisy)
+    after = calculate_mse(clean, denoised)
+    return (before - after) / (before + 1e-10) *100
+
+input_mse_results = [] 
+output_mse_results = []
+error_reduction_results = []
 
 
-# Load recordings
-clean, sr1 = load_audio("clean.wav")
-noisy, sr2 = load_audio("noisy.wav")
-denoised, sr3 = load_audio("denoised.wav")
+for clean_file in sorted(clean_folder.glob("*.npy")): # Iterate through all clean spectrogram files
+    noisy_file = noisy_folder / clean_file.name
+    denoised_file = denoised_folder / clean_file.name
 
-# Check audio compatibility
-if sr1 != sr2 or sr1 != sr3:
-    raise ValueError("Audio sample rates must match.")
+    if not noisy_file.exists() or not denoised_file.exists(): # Check if corresponding noisy and denoised files exist
+        print(f"Skipping {clean_file.name}, Missing files.")
+        continue
 
-if len(clean) != len(noisy) or len(clean) != len(denoised):
-    raise ValueError("Audio lengths must match.")
+    clean_spectrogram = load_spectrogram(clean_file) # Load clean spectrogram
+    noisy_spectrogram = load_spectrogram(noisy_file) # Load noisy spectrogram
+    denoised_spectrogram = load_spectrogram(denoised_file) # Load denoised spectrogram
 
-# Calculate metrics
-input_snr = calculate_snr(clean, noisy)
-output_snr = calculate_snr(clean, denoised)
+    if clean_spectrogram.shape != noisy_spectrogram.shape or clean_spectrogram.shape != denoised_spectrogram.shape: 
+        print(f"Skipping {clean_file.name}, Shape mismatch.")
+        continue
 
-input_sdr = calculate_si_sdr(clean, noisy)
-output_sdr = calculate_si_sdr(clean, denoised)
+    input_mse = calculate_mse(clean_spectrogram, noisy_spectrogram) # Calculate MSE between clean and noisy spectrogram
+    output_mse = calculate_mse(clean_spectrogram, denoised_spectrogram) # Calculate MSE between clean and denoised spectrogram
+    error_reduction = calculate_error_reduction(clean_spectrogram, noisy_spectrogram, denoised_spectrogram) # Calculate error reduction percentage
 
-error_reduction = calculate_error_reduction(clean, noisy, denoised)
+    input_mse_results.append(input_mse)  
+    output_mse_results.append(output_mse)
+    error_reduction_results.append(error_reduction)
 
-# Display results
-print(f"Input SNR: {input_snr:.2f} dB")
-print(f"Output SNR: {output_snr:.2f} dB")
-print(f"SNR Improvement: {output_snr - input_snr:.2f} dB")
+    print(f"{clean_file.name}: Error Reduction: {error_reduction:.2f}% errror reduction")
 
-print(f"Input SI-SDR: {input_sdr:.2f} dB")
-print(f"Output SI-SDR: {output_sdr:.2f} dB")
-print(f"SI-SDR Improvement: {output_sdr - input_sdr:.2f} dB")
+if len(error_reduction_results)>0: 
+    print("Dataset Evaluation Results:")
 
-print(f"Error Reduction: {error_reduction:.2f}%")
+    print(f"Song evaluated: {len(error_reduction_results)}") #Prints out total number of songs
+
+    print(f"Average Input MSE: {np.mean(input_mse_results):.4f}")
+    print(f"Average Output MSE: {np.mean(output_mse_results):.4f}") #Note .4f just means display the number with 4 decimal places
+
+    print(f"Average Error Reduction: {np.mean(error_reduction_results):.2f}%")
+
+else:
+    print("No valid files were evaluated.")
