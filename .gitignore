@@ -10,6 +10,7 @@ noise/
 train/
 val/
 test/
+src/models/checkpoints/*
 
 # Audio, spectrograms, & NumPy arrays
 *.wav
