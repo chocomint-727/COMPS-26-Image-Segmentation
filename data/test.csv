@@ -1,2 +1,0 @@
-mix_path,clean_path,noise_path,duration
-test/123502/mixture.wav,test/123502/clean.wav,test/123502/noise.wav,30.003
