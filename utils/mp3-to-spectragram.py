@@ -24,6 +24,7 @@ for files in audio_files:
 
         # Compute the Short-Time Fourier Transform (STFT)
         # Finds out which frequencies exist in an audio signal and when they occur.
+        # The output D is a grid of complex numbers containing both magnitude (how loud) and phase (wave alignment).
         D = librosa.stft(y)
         # Computes the magnitde/amplitude of each recorded frequency in the audio signal.
         magnitude = np.abs(D)
