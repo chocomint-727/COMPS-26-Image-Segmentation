@@ -92,3 +92,7 @@ python utils/eval_figs.py
 - **`evaluate_unet.py`:** writes `evaluation_results/spectrogram_metrics*.csv`. `GRIFFIN_LIM_ITERS` sets the phase reconstruction. Use `0` to keep the mixture's phase and `32` to run Griffin-Lim.
 - **`evaluate_spleeter.py`:** runs Spleeter on any test clip that has no stems yet then writes `evaluation_results/spleeter/spleeter_metrics.csv`.
 - **`eval_figs.py`:** saves the figures to `evaluation_results/figures/`.
+
+## AI Disclosure
+
+We made use of AI tools in the completion of this project. However, AI was not used to replace any of the learning needed in order to produce results, as this would have violated our stated goal of prioritizing learning. It was instead used to debug code in the case of our U-Net implementation and to produce code that members of the group could have produced with minimal cognitive effort, such as the noise generation script. When any group member's knowledge of topics was insufficient, we used AI to research, but primarily to find relevant resources which we read and understood ourselves.
