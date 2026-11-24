@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
+.venv/
 
 # Dataset & split directories
 clean/
@@ -10,7 +11,9 @@ noise/
 train/
 val/
 test/
-src/models/checkpoints/*
+cache/
+src/unet/checkpoints/*
+src/spleeter/clean_noise/*
 
 # Audio, spectrograms, & NumPy arrays
 *.wav

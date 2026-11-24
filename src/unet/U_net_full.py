@@ -7,7 +7,6 @@ from torch.amp import autocast, GradScaler
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.checkpoint import checkpoint
-import matplotlib.pyplot as plt
 import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -133,13 +132,27 @@ scaler = GradScaler('cuda')
 channel_outs = [32, 64, 128, 256, 384, 512]
 layer_ct = len(channel_outs)
 
-model = UNet(raw_channels=1, output_classes=2, layer_count=layer_ct, channel_outs=channel_outs + channel_outs[::-1]).to(device)
+real_params = {
+    "raw_channels" : 1,
+    "output_classes" : 2
+}
+
+complex_params = {
+    "raw_channels" : 2,
+    "output_classes" : 4
+}
+
+model = UNet(**real_params, layer_count=layer_ct, channel_outs=channel_outs + channel_outs[::-1]).to(device)
 criterion = torch.nn.L1Loss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
 
 # print(model)
 total_params = sum(p.numel() for p in model.parameters())
 print(f"Total parameters: {total_params:,}")
+
+dataset_path = "/ws/data/spectrogram-magnitude/numpy-files"
+files = {}
+target_files = ["clean.npy", "mixture.npy", "noise.npy"]
 
 class LazyDiskDataset(Dataset):
     def __init__(self, file_dict : dict):
@@ -159,12 +172,12 @@ def truncate_collate(batch_list):
     min_length = min(
         item[key].shape[1] 
         for item in batch_list 
-        for key in ["mixture", "noise", "clean"]
+        for key in [i.split(".")[0] for i in target_files]
     )
     min_height = min(
         item[key].shape[0]
         for item in batch_list
-        for key in ["mixture", "noise", "clean"]
+        for key in [i.split(".")[0] for i in target_files]
     )
     
     min_length = (min_length // (2**len(channel_outs))) * 2**(len(channel_outs))
@@ -191,11 +204,6 @@ def truncate_collate(batch_list):
         
     return collated_batch
 
-
-
-dataset_path = "/ws/data/spectrogram/numpy-files"
-files = {}
-target_files = ["clean.npy", "mixture.npy", "noise.npy"]
 
 for item in os.listdir(dataset_path):
     child_folder_path = os.path.join(dataset_path, item)
@@ -228,6 +236,7 @@ train_loader = DataLoader(
     collate_fn=truncate_collate
 ) 
 
+
 EMA_RATIO = 0.8
 
 running_loss_clean = 0.0
@@ -249,10 +258,11 @@ for epoch in range(50):
         with autocast('cuda'):
             logits = model(mixture)
             
-        clean_loss = criterion(logits[:, 0], cleans.squeeze(1))
-        noise_loss = criterion(logits[:, 1], noises.squeeze(1))
+        clean_loss = criterion(logits[:, 0], cleans)
+        noise_loss = criterion(logits[:, 1], noises)
+        energy_loss = criterion(torch.sum(logits, dim=1), mixture)
 
-        scaler.scale(clean_loss + noise_loss).backward()
+        scaler.scale(clean_loss + noise_loss + energy_loss).backward()
         scaler.unscale_(optimizer)
         
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -270,99 +280,4 @@ for epoch in range(50):
         })
     torch.save(model.state_dict(), f'checkpoints/full/spectrogram_{running_loss_clean + running_loss_noise:.4f}.pt')
 
-
-# Initialize model architecture and load weights safely
-# model.load_state_dict(torch.load("checkpoints/full/spectrogram_7.4644", map_location=device, weights_only=True))
-model.eval()
-
-# 2. Extract a sample batch from your DataLoader
-# We use the train_loader since it's already structured in your notebook
-batch = next(iter(train_loader))
-
-mixture_tensor = batch["mixture"][0:1].to(device)  # shape: [1, 1, H, W]
-clean_gt = batch["clean"][0].squeeze().numpy()     # Ground truth clean
-noise_gt = batch["noise"][0].squeeze().numpy()     # Ground truth noise
-mix_img = batch["mixture"][0].squeeze().numpy()    # Ground truth mixture
-
-# 3. Perform inference without computing gradients
-with torch.no_grad():
-    logits = model(mixture_tensor)
-    # Your model has no final activation function, so we clip or directly view outputs
-    predictions = logits.squeeze(0).cpu().numpy()  # shape: [2, H, W]
-
-pred_clean = predictions[0]
-pred_noise = predictions[1]
-
-# 4. Plot 2x3 grid to directly compare ground truth vs predictions
-fig, axes = plt.subplots(2, 3, figsize=(15, 8))
-
-# Column 1: Mixture Input
-axes[0, 0].imshow(mix_img, aspect='auto', origin='lower', cmap='viridis')
-axes[0, 0].set_title("Input Mixture Spectrogram")
-axes[1, 0].axis('off') # Keep grid clean since input applies to both outputs
-
-# Column 2: Clean Source (GT vs Prediction)
-axes[0, 1].imshow(clean_gt, aspect='auto', origin='lower', cmap='viridis')
-axes[0, 1].set_title("Ground Truth: Clean")
-axes[1, 1].imshow(pred_clean, aspect='auto', origin='lower', cmap='viridis')
-axes[1, 1].set_title("Predicted: Clean")
-
-# Column 3: Noise Source (GT vs Prediction)
-axes[0, 2].imshow(noise_gt, aspect='auto', origin='lower', cmap='viridis')
-axes[0, 2].set_title("Ground Truth: Noise")
-axes[1, 2].imshow(pred_noise, aspect='auto', origin='lower', cmap='viridis')
-axes[1, 2].set_title("Predicted: Noise")
-
-# Clean up axes styling
-for ax in axes.flatten():
-    if ax.axison:
-        ax.set_xlabel("Time Frames")
-        ax.set_ylabel("Frequency Bins")
-
-plt.tight_layout()
-plt.show()
-
-import librosa
-import numpy as np
-import soundfile as sf
-from pathlib import Path
-
-# --- Configuration ---
-# 1. Provide the expected sample rate (e.g., 22050, 44100, etc.)
-# This dictates the playback speed of your reconstructed audio file.
-TARGET_SR = 44100  
-
-for pair in (("mix", mix_img), ("pred", pred_clean), ("clean", clean_gt)):
-    name, tens = pair[0], pair[1]
-    # 2. Set up your output path
-    output_dir = Path("../data/spectrogram/reconstructed-audio")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    save_path = output_dir / f"reconstructed_{name}.wav"
-
-
-    # --- Reconstruct Array to Audio ---
-    try:
-        print(f"Converting '{name}' to audio...")
-
-        # 1. Reverse the decibel conversion back to linear amplitude
-        # (Matches your script's librosa.amplitude_to_db transformation)
-        magnitude = librosa.db_to_amplitude(tens, ref=1.0)
-
-        # 2. Reconstruct the phase using Griffin-Lim
-        # Uses Librosa's default STFT parameters (n_fft=2048, hop_length=512)
-        y_reconstructed = librosa.griffinlim(
-            magnitude,
-            n_iter=32,       # 32 iterations provides a solid quality-to-speed balance
-            hop_length=512,
-            win_length=None  # Matches default n_fft
-        )
-
-        # 3. Peak-normalize the waveform to prevent digital clipping
-        y_normalized = librosa.util.normalize(y_reconstructed)
-
-        # 4. Write directly to a WAV file
-        sf.write(save_path, y_normalized, TARGET_SR)
-        print(f"🎉 Success! Audio saved directly to: {save_path}")
-
-    except Exception as e:
-        print(f"Error during audio reconstruction: {e}")
+print("Training Complete.")

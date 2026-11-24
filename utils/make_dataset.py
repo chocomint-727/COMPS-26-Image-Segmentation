@@ -27,7 +27,7 @@ parser.add_argument(
     "--noise-type",
     choices=["analog", "demand", "both"],
     default="both",
-    help="Generate an analog dataset, a demand dataset, or both."
+    help="Generate an analog dataset, a demand dataset, or both. Support for the DEMAND dataset is not yet functional"
 )
 args = parser.parse_args()
 

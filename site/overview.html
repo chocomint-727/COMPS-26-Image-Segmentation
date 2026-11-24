@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Overview | Denoising Spectrograms</title>
+      <link rel="stylesheet" href="css/components.css">
+      <link rel="stylesheet" href="css/icons.css">
+      <link rel="stylesheet" href="css/responsee.css">
+      <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
+      <link rel="stylesheet" href="owl-carousel/owl.theme.css">
+      <!-- CUSTOM STYLE -->
+      <link rel="stylesheet" href="css/template-style.css">
+      <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+      <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+      <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+   </head>
+
+   <body class="size-1280 slide-to-right">
+      <a href="index.html"><img class="logo" src="img/logo.svg" alt="Denoising Spectrograms"></a>
+
+      <nav class="slide-nav aside-nav">
+        <ul>
+           <li><a href="index.html">Home</a></li>
+           <li class="active-item"><a href="overview.html">Overview</a></li>
+        </ul>
+      </nav>
+
+      <div class="slide-content">
+        <section id="right-content" class="s-12 m-10 l-8 xl-7 xxl-6 right">
+
+              <div class="line">
+                 <h1>Overview</h1>
+                 <p class="perex">Recorded music often carries artifacts introduced by the media on which it is stored, such as the crackle of worn vinyl records and the hiss of magnetic tape.</p>
+                 <p>We treat the removal of these artifacts as an image segmentation problem by converting audio into a spectrogram with the Short-Time Fourier Transform, and we compare two encoder-decoder networks trained from scratch on this task: a U-Net of our own configuration and Spleeter, an open-source model originally designed to separate musical stems. We train both on music from the Free Music Archive mixed with either synthetic vinyl crackle or tape hiss at signal-to-noise ratios between 0 and 20&nbsp;dB, and we evaluate the accuracy of their predicted spectrograms as well as the quality of the audio they reconstruct.</p>
+                 <p>Our U-Net predicts spectrograms roughly three times more accurately than Spleeter, with a mean squared error of 41.07&nbsp;dB&sup2; compared to 122.10&nbsp;dB&sup2;, while Spleeter reconstructs considerably cleaner audio, reaching an average signal-to-noise ratio of 21.28&nbsp;dB against 10.83&nbsp;dB for our U-Net, whose output falls below the 12.35&nbsp;dB of the noisy input. The discrepancy persists when both models reuse the phase of the noisy mixture, so it is not caused by phase estimation, which only lowers our U-Net&rsquo;s score further.</p>
+                 <p>We attribute the discrepancy instead to our U-Net being trained and evaluated on decibel spectrograms, which emphasize quiet bins that carry little of the audio&rsquo;s energy, and to its predicting the clean spectrogram directly rather than masking the mixture, which leaves its output near 11&nbsp;dB regardless of how clean its input is.</p>
+
+                 <h2 class="section-title">Figures</h2>
+
+                 <h3 class="fig-title">Noise types</h3>
+                 <div class="panel-row">
+                    <figure><img src="img/panel-vinyl.jpg" alt="Spectrogram of vinyl crackle"><figcaption>Vinyl crackle</figcaption></figure>
+                    <figure><img src="img/panel-tape.jpg" alt="Spectrogram of tape hiss"><figcaption>Tape hiss</figcaption></figure>
+                 </div>
+
+                 <h3 class="fig-title">Noise levels</h3>
+                 <div class="panel-row panel-row-5">
+                    <figure><img src="img/panel-snr-0.jpg" alt="Song mixed with noise at 0 dB SNR"><figcaption>0 dB</figcaption></figure>
+                    <figure><img src="img/panel-snr-5.jpg" alt="Song mixed with noise at 5 dB SNR"><figcaption>5 dB</figcaption></figure>
+                    <figure><img src="img/panel-snr-10.jpg" alt="Song mixed with noise at 10 dB SNR"><figcaption>10 dB</figcaption></figure>
+                    <figure><img src="img/panel-snr-15.jpg" alt="Song mixed with noise at 15 dB SNR"><figcaption>15 dB</figcaption></figure>
+                    <figure><img src="img/panel-snr-20.jpg" alt="Song mixed with noise at 20 dB SNR"><figcaption>20 dB</figcaption></figure>
+                 </div>
+
+                 <h3 class="fig-title">Spleeter masking</h3>
+                 <div class="equation">
+                    <figure><img src="img/panel-noisy.jpg" alt="Noisy spectrogram"><figcaption>Noisy</figcaption></figure>
+                    <span class="op">&times;</span>
+                    <figure><img src="img/panel-mask.jpg" alt="Predicted music mask"><figcaption>Mask</figcaption></figure>
+                    <span class="op">=</span>
+                    <figure><img src="img/panel-clean.jpg" alt="Clean estimate"><figcaption>Clean</figcaption></figure>
+                 </div>
+
+                 <h3 class="fig-title">Spectrogram error</h3>
+                 <figure class="result-fig"><img src="img/fig-spectrogram-error.png" alt="Bar chart of mean spectrogram error: noisy input 517, U-Net 41, Spleeter 122 dB squared over all frequencies; 219, 40 and 101 below 11 kHz"><figcaption>Lower is better</figcaption></figure>
+
+                 <h3 class="fig-title">Audio quality</h3>
+                 <figure class="result-fig"><img src="img/fig-snr-by-level.png" alt="Line chart of output SNR by noise level: Spleeter rises from about 17 to 26 dB, the U-Net stays between 10 and 12 dB, and the noisy input rises from 2.5 to 22.6 dB"><figcaption>Higher is better</figcaption></figure>
+
+                 <a class="more-button" href="index.html">Back to Home</a>
+              </div>
+
+        </section>
+      </div>
+
+
+      <!-- BACKGROUND CAROUSEL -->
+           <div id="background-carousel">
+              <div class="owl-carousel owl-theme">
+                 <div class="item" style="background-image: url(img/bg-levels.jpg)"></div>
+              </div>
+           </div>
+
+      <script type="text/javascript" src="js/responsee.js"></script>
+      <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
+      <script type="text/javascript">
+        jQuery(document).ready(function($) {
+          var owl = $('#background-carousel .owl-carousel');
+          owl.owlCarousel({
+            nav: false,
+            dots: false,
+            items: 1,
+            loop: true,
+            animateOut: 'fadeOut',
+            autoplay: true,
+            autoplayTimeout: 4000
+          });
+        })
+      </script>
+   </body>
+</html>

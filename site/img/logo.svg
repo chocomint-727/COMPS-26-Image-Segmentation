@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="90" viewBox="0 0 400 90">
+  <text x="0" y="38" fill="#FFFFFF" font-family="Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="3">DENOISING</text>
+  <text x="0" y="80" fill="#FFFFFF" font-family="Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="300" letter-spacing="3">SPECTROGRAMS</text>
+</svg>

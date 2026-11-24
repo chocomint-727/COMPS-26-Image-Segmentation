@@ -1,18 +1,11 @@
-"""Generate synthetic vinyl crackle and tape hiss as mono 44.1 kHz wav files.
-
-Writes raw/noise/analog/vinyl_crackle_00.wav, tape_hiss_00.wav, and so on.
-The files are rough stand-ins for real analog artifacts. 
-
-Usage:  python make_analog_noise.py
-"""
+"""Generate synthetic vinyl crackle and tape hiss as mono 44.1 kHz wav files."""
 import os
-
 import numpy as np
 import soundfile as sf
 
 SR = 44100
 SECONDS = 60
-VARIANTS = 6  # files of each kind
+VARIANTS = 6 
 OUT_DIR = "raw/noise/analog"
 
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -22,8 +15,7 @@ t = np.arange(n) / SR
 for i in range(VARIANTS):
     rng = np.random.default_rng(i)
 
-    # ---- vinyl crackle: sparse clicks, each a short decaying burst of noise,
-    # on top of a faint high-passed surface noise.
+    # vinyl crackle
     crackle = np.zeros(n)
     clicks_per_second = rng.uniform(5, 40)
     n_clicks = int(clicks_per_second * SECONDS)
@@ -37,8 +29,7 @@ for i in range(VARIANTS):
     crackle = 0.9 * crackle / np.max(np.abs(crackle))
     sf.write(f"{OUT_DIR}/vinyl_crackle_{i:02d}.wav", crackle, SR, subtype="PCM_16")
 
-    # ---- tape hiss: white noise tilted toward high frequencies (first difference),
-    # with a slow level drift so it is not perfectly steady.
+    # tape hiss
     white = rng.standard_normal(n + 1)
     hiss = np.diff(white)
     drift = 1 + 0.2 * np.sin(2 * np.pi * rng.uniform(0.05, 0.3) * t + rng.uniform(0, 6.28))

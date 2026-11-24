@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Home | Denoising Spectrograms</title>
+      <link rel="stylesheet" href="css/components.css">
+      <link rel="stylesheet" href="css/icons.css">
+      <link rel="stylesheet" href="css/responsee.css">
+      <link rel="stylesheet" href="owl-carousel/owl.carousel.css">
+      <link rel="stylesheet" href="owl-carousel/owl.theme.css">
+      <!-- CUSTOM STYLE -->
+      <link rel="stylesheet" href="css/template-style.css">
+      <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+      <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+      <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+   </head>
+
+   <body class="size-1280 slide-to-right">
+      <a href="index.html"><img class="logo" src="img/logo.svg" alt="Denoising Spectrograms"></a>
+
+      <nav class="slide-nav aside-nav">
+        <ul>
+           <li class="active-item"><a href="index.html">Home</a></li>
+           <li><a href="overview.html">Overview</a></li>
+        </ul>
+      </nav>
+
+      <div class="slide-content">
+        <section id="right-content" class="s-12 m-10 l-8 xl-7 xxl-6 right">
+
+              <div class="line">
+                 <h1>Denoising Spectrograms</h1>
+                 <p class="perex">Segmenting noise artifacts from song.</p>
+                 <p class="team">Christian Park, Omar Sobhy, Jeremiah Dawson, Anthony Iyengunmwena</p>
+                 <div class="equation">
+                    <figure><img src="img/panel-noisy.jpg" alt="Noisy spectrogram"><figcaption>Noisy</figcaption></figure>
+                    <span class="op">&times;</span>
+                    <figure><img src="img/panel-mask.jpg" alt="Predicted music mask"><figcaption>Mask</figcaption></figure>
+                    <span class="op">=</span>
+                    <figure><img src="img/panel-clean.jpg" alt="Clean estimate"><figcaption>Clean</figcaption></figure>
+                 </div>
+                 <p>We treat noisy music as an image, because a spectrogram shows a recording's frequencies over time, so removing vinyl crackle and tape hiss from a song becomes a matter of finding which parts of that image are music and which are noise, and we compare our own U-Net with the open-source Spleeter model at doing this.</p>
+                 <div class="home-buttons">
+                    <!-- TODO: replace href="#" with the paper link -->
+                    <a class="more-button" href="#" target="_blank">Paper</a>
+                    <!-- TODO: replace href="#" with the poster PDF link -->
+                    <a class="more-button" href="#" target="_blank">Poster</a>
+                    <a class="more-button" href="https://github.com/chocomint-727/COMPS-26-Image-Segmentation" target="_blank">Source Code</a>
+                    <a class="more-button blue-more-button" href="overview.html">Overview</a>
+                 </div>
+              </div>
+
+        </section>
+      </div>
+
+
+      <!-- BACKGROUND CAROUSEL -->
+           <div id="background-carousel">
+              <div class="owl-carousel owl-theme">
+                 <div class="item" style="background-image: url(img/bg-noisy.jpg)"></div>
+                 <div class="item" style="background-image: url(img/bg-levels.jpg)"></div>
+                 <div class="item" style="background-image: url(img/bg-clean.jpg)"></div>
+              </div>
+           </div>
+
+      <script type="text/javascript" src="js/responsee.js"></script>
+      <script type="text/javascript" src="owl-carousel/owl.carousel.js"></script>
+      <script type="text/javascript">
+        jQuery(document).ready(function($) {
+          var owl = $('#background-carousel .owl-carousel');
+          owl.owlCarousel({
+            nav: false,
+            dots: false,
+            items: 1,
+            loop: true,
+            animateOut: 'fadeOut',
+            autoplay: true,
+            autoplayTimeout: 4000
+          });
+        })
+      </script>
+   </body>
+</html>
