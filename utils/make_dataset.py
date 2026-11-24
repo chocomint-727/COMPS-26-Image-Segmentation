@@ -1,4 +1,4 @@
-# python utils/make_dataset.py --noise-type analog
+"""To use, run python utils/make_dataset.py --noise-type analog for analog noise"""
 
 import argparse
 import csv
@@ -25,14 +25,10 @@ NOISE_NAME = "/noise"
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--noise-type",
-    choices=["analog", "demand", "both"],
-    default="both",
-    help="Generate an analog dataset, a demand dataset, or both. Support for the DEMAND dataset is not yet functional"
+    choices=["analog", "demand", "both"]
 )
 args = parser.parse_args()
-
 random.seed(SEED)
-
 
 def split_80_10_10(items):
     """Shuffle a list and cut it into train / val / test."""
@@ -47,7 +43,7 @@ def split_80_10_10(items):
 
 
 def load_noise_slice(path, n_samples):
-    """Read n_samples of mono noise starting at a random point in the file."""
+    """Read n_samples of mono noise starting at a random point in the file"""
     seconds = n_samples / SR
     file_seconds = librosa.get_duration(path=path)
     start = random.uniform(0, max(0, file_seconds - seconds))
@@ -76,6 +72,7 @@ dataset_types = (
 )
 
 for dataset_type in dataset_types:
+    # main loop
     if dataset_type == "analog":
         noise_files = sorted(glob.glob(f"{NOISE_DIR}/analog/*.wav"))
     else:
@@ -104,7 +101,7 @@ for dataset_type in dataset_types:
     for split in ["train", "val", "test"]:
         for clip_path in clip_split[split]:
 
-            # load the clean clip as stereo.
+            # load the clean clip as stereo
             try:
                 clean, _ = librosa.load(clip_path, sr=SR, mono=False)
             except Exception as err:
@@ -127,9 +124,9 @@ for dataset_type in dataset_types:
             if noise_power < 1e-12:
                 continue
 
-            # 10 * log10(clean power / noise power) = snr_db.
+            # 10*log10(clean power/noise power) = snr
             snr_db = random.choice(SNRS_DB)
-            gain = np.sqrt(clean_power / (noise_power * 10 ** (snr_db / 10)))
+            gain = np.sqrt(clean_power / (noise_power *10** (snr_db /10)))
             noise = noise * gain
             mixture = clean + noise
             # handle clipping

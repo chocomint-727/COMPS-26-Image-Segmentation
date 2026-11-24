@@ -1,4 +1,9 @@
-"""Generate synthetic vinyl crackle and tape hiss as mono 44.1 kHz wav files."""
+"""Generates synthetic vinyl crackle and tape hiss as mono 44.1 kHz wav files.
+The logic behind this was described to AI chatbot Claude which generated the exact
+mathematical calculations we needed to produce the sounds to the level of complexity 
+we desired while giving us control to tinker around with the exact sounds we wanted.
+"""
+
 import os
 import numpy as np
 import soundfile as sf
@@ -9,12 +14,11 @@ VARIANTS = 6
 OUT_DIR = "raw/noise/analog"
 
 os.makedirs(OUT_DIR, exist_ok=True)
-n = SR * SECONDS
+n = SR*SECONDS
 t = np.arange(n) / SR
 
 for i in range(VARIANTS):
     rng = np.random.default_rng(i)
-
     # vinyl crackle
     crackle = np.zeros(n)
     clicks_per_second = rng.uniform(5, 40)
